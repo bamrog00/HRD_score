@@ -46,6 +46,7 @@ no_match = 0
 df_diff = data.frame(matrix(nrow = 0, ncol = 1))
 colnames(df_diff) = 'Difference'
 # Get file name, search for it in the validation dataframe and compare each score
+
 for (i in 1:nrow(df)){
   name = df[i,"file_name"]
   HRD = df[i,'HRD']
@@ -112,13 +113,16 @@ print(df)
 write.csv(df,'../data/validation_testing/results_HRD_SARC_new.csv',row.names = FALSE)
 df = data.frame(read.csv('../data/validation_testing/results_HRD_SARC_new.csv'))
 
-#Plotting:
+#### Plotting ####
+
+# Histogram of the difference between the TAI scores. X-axis are the difference and the y-axis the amount
 diff_histo = ggplot(df_diff, aes(x=Difference)) + geom_histogram(binwidth = 1, color = 1, fill = 'grey') + scale_y_continuous(breaks = seq(0, 60, 5)) +
    labs(x = 'Difference value') + ggtitle("Difference in TAI scores between Alicia and Roger \n TCGA-SARC") +
   theme(plot.title = element_text(hjust = 0.5)) + stat_bin(aes(label = ..count..), geom = "text", binwidth = 1, vjust = -0.5)
 diff_histo
 ggsave('../data/figures_validation/difference_histo.png',diff_histo)
 
+# Frequency plot showing the difference in frequency between the results of Alicia and mine (TAI)
 tai_plot = ggplot() + geom_density(data = df, aes(x=TAI, color = 'Roger'), alpha = 0.3) + geom_density(data = df_validation, aes(x=Telomeric.AI, color = 'Alicia'))+
   labs(x = "Telomeric allelic imbalance (TAI)", color = NULL) + ggtitle("TAI score value frequency from Alicia and Roger \n TCGA-SARC") +
   theme(plot.title = element_text(hjust = 0.5)) + scale_color_manual(values = c('Roger' = 'red', 'Alicia' = 'blue')) +
@@ -126,6 +130,7 @@ tai_plot = ggplot() + geom_density(data = df, aes(x=TAI, color = 'Roger'), alpha
 tai_plot
 ggsave('../data/figures_validation/density_tai.png',tai_plot)
 
+# Frequency plot showing the difference in frequency between the results of Alicia and mine (LOH)
 HRD_plot = ggplot() + geom_density(data = df, aes(x=HRD, color = 'Roger')) + geom_density(data = df_validation, aes(x=HRD, color = 'Alicia'))+
   labs(x = "Loss-of-heterozygosity (LOH)", color = NULL) + ggtitle("LOH score value frequency from Alicia and Roger \n TCGA-SARC") +
   theme(plot.title = element_text(hjust = 0.5)) + scale_color_manual(values = c('Roger' = 'red', 'Alicia' = 'blue')) +
@@ -133,6 +138,7 @@ HRD_plot = ggplot() + geom_density(data = df, aes(x=HRD, color = 'Roger')) + geo
 HRD_plot
 ggsave('../data/figures_validation/density_hrd.png',HRD_plot)
 
+# Frequency plot showing the difference in frequency between the results of Alicia and mine (LST)
 LST_plot = ggplot() + geom_density(data = df, mapping = aes(x=LST, color = 'Roger')) + geom_density(data = df_validation, aes(x=LST, color = 'Alicia'))+
   labs(x = "Large-scale transitions (LST)", color = NULL) + ggtitle("LST score value frequency from Alicia and Roger \n TCGA-SARC") +
   theme(plot.title = element_text(hjust = 0.5)) + scale_color_manual(values = c('Roger' = 'red', 'Alicia' = 'blue')) +
@@ -140,6 +146,7 @@ LST_plot = ggplot() + geom_density(data = df, mapping = aes(x=LST, color = 'Roge
 LST_plot
 ggsave('../data/figures_validation/density_lst.png',LST_plot)
 
+# Frequency plot showing the difference in frequency between the results of Alicia and mine (HRD sum)
 HRDs_plot = ggplot() + geom_density(data = df, mapping = aes(x=HRD_sum, color = 'Roger')) + geom_density(data = df_validation, aes(x=HRD.sum, color = 'Alicia'))+
   labs(x = "HRD sum/ HRD score", color = NULL) + ggtitle("HRDsum value frequency from Alicia and Roger \n TCGA-SARC") +
   theme(plot.title = element_text(hjust = 0.5)) + scale_color_manual(values = c('Roger' = 'red', 'Alicia' = 'blue')) +

@@ -7,8 +7,12 @@ HRD_scores = data.frame(read.csv('../data/HRD_scores_pan_cancer_annotated_typeco
 
 scores = c("HRD_sum","TAI","LOH","LST")
 
-## With ProjectID ##
+## Cancer types are labeled with their Project ID ##
+
 ##### HRD scores plots for pan cancer ####
+
+# Boxplot of each score containing all cancertypes
+
 n_obs <- table(HRD_scores$Project.ID)
 for (score in scores){
   if (score == 'HRD_sum'){
@@ -33,6 +37,8 @@ for (score in scores){
 
 
 #### HRD scores plots with subgrouping by Type (Primary, Metastatic, Recurrent) ####
+
+# Boxplot of each score containing all cancertypes, each split up into the three sample types (Primary, Recurrent, Metastatic)
 
 n_obs <- table(HRD_scores$Project.ID)
 n_obs_types <- table(HRD_scores$Project.ID, HRD_scores$Type)
@@ -64,7 +70,7 @@ for (score in scores){
 
 #### Boxplot per cancer type with every score ####
 
-
+# Creates a bocplot for each cancer type containing all 4 scores and saves them
 for (i in unique(HRD_scores$Project.ID)) {
   df_subset <- HRD_scores[HRD_scores$Project.ID == i,]
   plot_data <- data.frame(Score = c(rep("LST", nrow(df_subset)), 
@@ -83,13 +89,17 @@ for (i in unique(HRD_scores$Project.ID)) {
   ggsave(paste('../data/figures_pan_cancer/bp_scores_per_cancer/',i,'.png',sep = ''))
 }
 
+# Next part combines the previous created boxplot per cancertype into one summary plot
+# Get the plots
 files = list.files(path = "../data/figures_pan_cancer/bp_scores_per_cancer/", pattern = NULL, all.files = FALSE,
                    full.names = TRUE, recursive = FALSE,
                    ignore.case = FALSE, include.dirs = FALSE, no.. = FALSE)
 
+# Create the grid for the new plot
 rl = lapply(files, png::readPNG)
 gl = lapply(rl, grid::rasterGrob)
 
+# Define parameters for the summary plot
 n_plots <- length(gl)
 n_rows <- ceiling(sqrt(n_plots))
 n_cols <- ceiling(n_plots / n_rows)
@@ -101,14 +111,73 @@ total_width <- sum(widths)
 total_height <- sum(heights)
 output_width <- total_width * 0.1
 output_height <- total_height * 0.1
-#grid.arrange(grobs=gl, ncol=n_cols, nrow=n_rows, widths=widths, heights=heights)
+
+# Plot the summary plot and save it
 summuary_plot = arrangeGrob(grobs=gl, ncol=n_cols, nrow=n_rows, widths=widths, heights=heights)
 ggsave("../data/figures_pan_cancer/summary_scores_plots.png",summuary_plot,width = output_width, height = output_height,limitsize = FALSE)
 
+
+#### Distribution plots ####
+
+# Only show Primary sample types
+HRD_scores_primary = HRD_scores[HRD_scores$Type == 'Primary',]
+
+
+# Create a density plot for each cancer type of the HRDsum and save it
+for (i in unique(HRD_scores_primary$Project.ID)) {
+  df_subset <- HRD_scores_primary[HRD_scores_primary$Project.ID == i,]
+  
+  plot = ggplot(df_subset, aes(x = as.numeric(HRD_sum))) +
+    geom_density(alpha = 0.4) +
+    labs(x = "HRD score", y = "Density", title = paste("HRD score Distribution of ",i,sep = ''))
+  
+  print(plot)
+  ggsave(paste('../data/figures_pan_cancer/density_plots_per_cancer/',i,'.png',sep = ''))
+}
+
+# Next part combines the previous created boxplot per cancertype into one summary plot
+# Get the plots
+files = list.files(path = "../data/figures_pan_cancer/density_plots_per_cancer/", pattern = NULL, all.files = FALSE,
+                   full.names = TRUE, recursive = FALSE,
+                   ignore.case = FALSE, include.dirs = FALSE, no.. = FALSE)
+
+# Create the grid for the new plot
+rl = lapply(files, png::readPNG)
+gl = lapply(rl, grid::rasterGrob)
+
+# Define parameters for the summary plot
+n_plots <- length(gl)
+n_rows <- ceiling(sqrt(n_plots))
+n_cols <- ceiling(n_plots / n_rows)
+
+widths <- rep(40, n_cols)
+heights <- rep(40, n_rows)
+
+total_width <- sum(widths)
+total_height <- sum(heights)
+output_width <- total_width * 0.1
+output_height <- total_height * 0.1
+
+# Plot the summary plot and save it
+summuary_plot = arrangeGrob(grobs=gl, ncol=n_cols, nrow=n_rows, widths=widths, heights=heights)
+ggsave("../data/figures_pan_cancer/summary_density_plots.png",summuary_plot,width = output_width, height = output_height,limitsize = FALSE)
+
+
+# Creates a plot containing all cancer types and their distribution of the HRDsum
+ggplot(HRD_scores_primary, aes(x = as.numeric(HRD_sum), fill = Project.ID)) +
+  geom_density(alpha = 0.4) +
+  labs(x = "HRD score", y = "Density", title = "HRD score Distribution by Cancer Type") +
+  scale_fill_discrete(name = "Cancer type")
+
+
+
 #### end ####
 
-## With Study name ## 
-##### HRD scores plots for pan cancer ####
+## Cancer types are labeled with their Study names ## 
+
+#### HRD scores plots for pan cancer ####
+
+# Creates a boxplot for each score containing all cancertypes
 n_obs <- table(HRD_scores$Study.Name)
 for (score in scores){
   if (score == 'HRD_sum'){
@@ -129,6 +198,8 @@ for (score in scores){
 }
 
 #### HRD scores plots with subgrouping by Type (Primary, Metastatic, Recurrent) ####
+
+# Boxplot of each score containing all cancertypes, each split up into the three sample types (Primary, Recurrent, Metastatic)
 
 n_obs <- table(HRD_scores$Study.Name)
 n_obs_types <- table(HRD_scores$Study.Name, HRD_scores$Type)
