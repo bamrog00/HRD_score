@@ -4,6 +4,11 @@ library(gridExtra)
 library(png)
 
 HRD_scores = data.frame(read.csv('../data/HRD_scores_pan_cancer_annotated_typecorrect.csv'))
+HRD_scores_v2 = data.frame(read.csv('../data/HRD_scores_pan_cancer_annotated_v2.csv'))
+
+HRD_scores_2_filtered = HRD_scores_v2[HRD_scores_v2$Type != 'Normal',]
+
+HRD_scores = HRD_scores_2_filtered
 
 scores = c("HRD_sum","TAI","LOH","LST")
 
@@ -22,10 +27,12 @@ for (score in scores){
   }
   score_plot = ggplot(HRD_scores,aes(x = reorder(Project.ID, -.data[[score]], FUN = median), y = .data[[score]], fill = Project.ID))  +
     geom_boxplot(show.legend = FALSE) + 
+    theme_bw()+
     stat_boxplot(geom='errorbar', linetype=1, width=0.5) + 
     theme(axis.text.x = element_text(angle = 75,hjust = 1.0), panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
     xlab('Project ID') + 
     ylab(y_label) +
+    labs(title = paste(score,' per cancer type',sep = ''))+
     scale_x_discrete(labels = function(x) paste0(x, " (n = ", n_obs[x],')'))
   print(score_plot)
   ggsave(paste('../data/figures_pan_cancer/pan_cancer/',score,'_bp.png',sep = ''),score_plot,width = 8.63, height = 5.71)
@@ -56,6 +63,7 @@ for (score in scores){
           panel.grid.minor = element_blank()) +
     xlab('Project ID') + 
     ylab(y_label) +
+    theme_bw()+
     scale_x_discrete(labels = function(x) {
       p <- n_obs_types[x, "Primary"]
       m <- n_obs_types[x, "Metastatic"]
@@ -84,6 +92,7 @@ for (i in unique(HRD_scores$Project.ID)) {
     theme(plot.title = element_text(hjust = 0.5)) +
     xlab("Scores") +
     ylab("Values") +
+    theme_bw() +
     ggtitle(i)
   print(plot)
   ggsave(paste('../data/figures_pan_cancer/bp_scores_per_cancer/',i,'.png',sep = ''))
@@ -129,6 +138,7 @@ for (i in unique(HRD_scores_primary$Project.ID)) {
   
   plot = ggplot(df_subset, aes(x = as.numeric(HRD_sum))) +
     geom_density(alpha = 0.4) +
+    theme_bw()+
     labs(x = "HRD score", y = "Density", title = paste("HRD score Distribution of ",i,sep = ''))
   
   print(plot)
@@ -191,6 +201,7 @@ for (score in scores){
     theme(axis.text.x = element_text(angle = 75,hjust = 1.0), panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
     xlab('Cancer type') + 
     ylab(y_label) +
+    theme_bw()+
     scale_x_discrete(labels = function(x) paste0(x, " (n = ", n_obs[x],')'))
   print(score_plot)
   ggsave(paste('../data/figures_pan_cancer/pan_cancer_studyname/',score,'_bp.png',sep = ''),score_plot,width = 8.63, height = 5.71)
@@ -217,6 +228,7 @@ for (score in scores){
           panel.grid.minor = element_blank()) +
     xlab('Cancer type') + 
     ylab(y_label) +
+    theme_bw() + 
     scale_x_discrete(labels = function(x) {
       p <- n_obs_types[x, "Primary"]
       m <- n_obs_types[x, "Metastatic"]
