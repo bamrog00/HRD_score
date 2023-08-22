@@ -15,8 +15,8 @@ This jupyter notebook can be used to get information about the pan-cancer cohort
 ### annotate_results
 This jupyter notebook can be used to annotate the results from the HRDscar algorithm with the metadata.
 
-### correlation_summary_plot
-What to do with this? Is not used and needed anymore
+### Check_OV
+Was used to check the composition of the OV cohort.
 
 ## R
 
